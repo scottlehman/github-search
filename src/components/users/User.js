@@ -1,24 +1,19 @@
-import React, { Component, Fragment } from 'react';
+import React, { useEffect, useContext, Fragment } from 'react';
 import Repos from '../repos/Repos';
 import Spinner from '../layout/Spinner';
-import PropTypes from 'prop-types';
 import { Link } from 'react-router-dom';
+import GithubContext from '../../context/github/githubContext';
 
-export class User extends Component {
-    componentDidMount() {
-        this.props.getUser(this.props.match.params.login);
-        this.props.getUserRepos(this.props.match.params.login);
-    }
-
-    static propTypes = {
-        loading: PropTypes.bool,
-        user: PropTypes.object.isRequired,
-        repos: PropTypes.array.isRequired,
-        getUser: PropTypes.func.isRequired,
-        getUserRepos: PropTypes.func.isRequired,
-    }
-
-    render() {
+const User = ({ match }) => {
+    const githubContext = useContext(GithubContext);
+    
+    const { getUser, loading, user, repos, getUserRepos } = githubContext;
+    
+    useEffect(() => {
+        getUser(match.params.login);
+        getUserRepos(match.params.login);
+        // eslint-disable-next-line
+    }, []);
 
         const {
             name,
@@ -34,9 +29,7 @@ export class User extends Component {
             public_repos,
             public_gists,
             hireable
-        } = this.props.user;
-
-        const { loading, repos } = this.props;
+        } = user;
 
         if(loading) return <Spinner />;
 
@@ -44,15 +37,15 @@ export class User extends Component {
             <Link to='/' className='btn btn-ligh'>Back to Search Results</Link>
             Hireable: {' '}
             {hireable ? (
-                <i className="fas fa-check text-success" />
+                <i className='fas fa-check text-success' />
                  ) : (
-                <i className="fas fa-check text-danger" /> 
+                <i className='fas fa-times-circle text-danger' /> 
                 )}
-                <div className="card grid-2">
-                    <div className="all-center">
+                <div className='card grid-2'>
+                    <div className='all-center'>
                         <img src={avatar_url}
-                            className="round-img"
-                            alt=""
+                            className='round-img'
+                            alt={name}
                             style={{ width: '150px' }}
                         />
                         <h1>{name}</h1>
@@ -64,7 +57,7 @@ export class User extends Component {
                             <p>{bio}</p>
                         </Fragment>
                         )}
-                        <a href={html_url} className="btn btn-dark my-1">Visit Github Profile
+                        <a href={html_url} className='btn btn-dark my-1'>Visit Github Profile
                         </a>
                         <ul>
                             <li>
@@ -86,16 +79,15 @@ export class User extends Component {
                     </div>
                 </div>
 
-                <div className="card text-center">
-                    <div className="badge badge-primary">Followers: {followers}</div>
-                    <div className="badge badge-success">Following: {following}</div>
-                    <div className="badge badge-light">Public Repos: {public_repos}</div>
-                    <div className="badge badge-dark">Public Gists: {public_gists}</div>
+                <div className='card text-center'>
+                    <div className='badge badge-primary'>Followers: {followers}</div>
+                    <div className='badge badge-success'>Following: {following}</div>
+                    <div className='badge badge-light'>Public Repos: {public_repos}</div>
+                    <div className='badge badge-dark'>Public Gists: {public_gists}</div>
                 </div>
 
                 <Repos repos={repos} />
         </Fragment>;
-    }
 }
 
 export default User;
